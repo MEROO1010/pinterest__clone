@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import 'home_screen.dart';
 
 class AuthScreen extends StatefulWidget {
+  static const routeName = '/auth';
+
   @override
   _AuthScreenState createState() => _AuthScreenState();
 }
@@ -13,33 +16,28 @@ class _AuthScreenState extends State<AuthScreen> {
   final _nameController = TextEditingController();
   bool _isLogin = true;
 
-  void _switchAuthMode() {
-    setState(() {
-      _isLogin = !_isLogin;
-    });
-  }
-
-  void _submit() {
+  void _submit() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (_isLogin) {
-      Provider.of<AuthProvider>(
-        context,
-        listen: false,
-      ).login(_emailController.text, _passwordController.text);
+      await authProvider.login(_emailController.text, _passwordController.text);
     } else {
-      Provider.of<AuthProvider>(context, listen: false).register(
+      await authProvider.register(
         _nameController.text,
         _emailController.text,
         _passwordController.text,
       );
+    }
+    if (authProvider.isAuth) {
+      Navigator.of(context).pushReplacementNamed(HomeScreen.routeName);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isLogin ? 'Login' : 'Register')),
+      appBar: AppBar(title: Text(_isLogin ? 'Login' : 'Sign Up')),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             if (!_isLogin)
@@ -59,12 +57,16 @@ class _AuthScreenState extends State<AuthScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _submit,
-              child: Text(_isLogin ? 'Login' : 'Register'),
+              child: Text(_isLogin ? 'Login' : 'Sign Up'),
             ),
             TextButton(
-              onPressed: _switchAuthMode,
+              onPressed: () {
+                setState(() {
+                  _isLogin = !_isLogin;
+                });
+              },
               child: Text(
-                _isLogin ? 'Create new account' : 'Already have an account?',
+                _isLogin ? 'Create new account' : 'I already have an account',
               ),
             ),
           ],

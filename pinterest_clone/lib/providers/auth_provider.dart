@@ -16,6 +16,10 @@ class AuthProvider with ChangeNotifier {
     return null;
   }
 
+  bool get isAuth {
+    return token != null;
+  }
+
   Future<void> register(String name, String email, String password) async {
     final url = Uri.parse('http://localhost:5000/api/users/register');
     try {

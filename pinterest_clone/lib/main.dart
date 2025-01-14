@@ -1,50 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:pinterest_clone/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
+import 'screens/auth_screen.dart';
+import 'screens/home_screen.dart';
+import 'utils/style.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(PinterestCloneApp());
+}
 
-class MyApp extends StatelessWidget {
+class PinterestCloneApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
-      child: MaterialApp(home: AuthScreen()),
-    );
-  }
-}
-
-class AuthScreen extends StatelessWidget {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Provider.of<AuthProvider>(
-                  context,
-                  listen: false,
-                ).login(emailController.text, passwordController.text);
+      child: Consumer<AuthProvider>(
+        builder:
+            (ctx, auth, _) => MaterialApp(
+              title: 'Pinterest Clone',
+              theme: AppThemes.lightTheme,
+              home: auth.isAuth ? HomeScreen() : AuthScreen(),
+              routes: {
+                HomeScreen.routeName: (ctx) => HomeScreen(),
+                AuthScreen.routeName: (ctx) => AuthScreen(),
               },
-              child: Text('Login'),
             ),
-          ],
-        ),
       ),
     );
   }
